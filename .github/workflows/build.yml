@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+
+    runs-on: [self-hosted, egrabber]
+
+    permissions:
+      actions: write
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Get CMake 3.24
+        uses: lukka/get-cmake@latest
+        with:
+          useCloudCache: false
+          useLocalCache: true
+          cmakeVersion: 3.24.3
+
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+
+      - name: Configure
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+
+      - name: Build
+        run: |
+          cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}}
+          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C ${{matrix.build_type}} -G ZIP
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{matrix.build_type}} binaries
+          path: ${{github.workspace}}/*.zip
