@@ -1,20 +1,24 @@
-#include "acquire.h"
-#include "device/hal/device.manager.h"
+/// @file
+/// @brief Lists the devices exposed by this driver.
+/// Exercises the device enumeration interface.
+
+#include "platform.h"
 #include "logger.h"
+#include "device/kit/driver.h"
 
 #include <cstdio>
-#include <stdexcept>
 
-#define L (aq_logger)
+#define L aq_logger
 #define LOG(...) L(0, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define ERR(...) L(1, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define CHECK(e)                                                               \
+#define LOGE(...) L(1, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+#define EXPECT(e, ...)                                                         \
     do {                                                                       \
         if (!(e)) {                                                            \
-            ERR("Expression was false:\n\t%s\n", #e);                          \
-            throw std::runtime_error("Expression was false: " #e);             \
+            LOGE(__VA_ARGS__);                                                 \
+            goto Error;                                                        \
         }                                                                      \
     } while (0)
+#define CHECK(e) EXPECT(e, "Expression evaluated as false:\n\t%s", #e)
 
 void
 reporter(int is_error,
@@ -23,30 +27,44 @@ reporter(int is_error,
          const char* function,
          const char* msg)
 {
-    printf("%s%s(%d) - %s: %s\n",
-           is_error ? "ERROR " : "",
-           file,
-           line,
-           function,
-           msg);
+    fprintf(is_error ? stderr : stdout,
+            "%s%s(%d) - %s: %s\n",
+            is_error ? "ERROR " : "",
+            file,
+            line,
+            function,
+            msg);
 }
 
+typedef struct Driver* (*init_func_t)(void (*reporter)(int is_error,
+                                                       const char* file,
+                                                       int line,
+                                                       const char* function,
+                                                       const char* msg));
+
 int
-main(int n, char** args)
+main()
 {
-    auto runtime = acquire_init(reporter);
-    CHECK(runtime);
-    auto device_manager = acquire_device_manager(runtime);
-    CHECK(device_manager);
-    for (uint32_t i = 0; i < device_manager_count(device_manager); ++i) {
-        struct DeviceIdentifier identifier = {};
-        CHECK(Device_Ok == device_manager_get(&identifier, device_manager, i));
-        CHECK(identifier.kind < DeviceKind_Count);
-        printf("%3d - %10s %s\n",
-               (int)i,
-               device_kind_as_string(identifier.kind),
-               identifier.name);
+    logger_set_reporter(reporter);
+    lib lib{};
+    CHECK(lib_open_by_name(&lib, "acquire-driver-egrabber"));
+    {
+        auto init = (init_func_t)lib_load(&lib, "acquire_driver_init_v0");
+        auto driver = init(reporter);
+        CHECK(driver);
+        const auto n = driver->device_count(driver);
+        for (uint32_t i = 0; i < n; ++i) {
+            DeviceIdentifier id{};
+            char buf[1 << 7] = { 0 };
+            CHECK(driver->describe(driver, &id, i) == Device_Ok);
+            device_identifier_as_debug_string(buf, sizeof(buf), &id);
+            LOG("%d %s", i, buf);
+        }
+        driver->shutdown(driver);
     }
-    acquire_shutdown(runtime);
+    lib_close(&lib);
     return 0;
+Error:
+    lib_close(&lib);
+    return 1;
 }

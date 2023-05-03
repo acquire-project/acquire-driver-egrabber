@@ -713,7 +713,7 @@ EGCamera::maybe_set_shape(CameraProperties::camera_properties_shape_s target,
 bool
 is_equal(const Trigger& lhs, const Trigger& rhs)
 {
-    return memcmp(&lhs, &rhs, sizeof(Trigger));
+    return memcmp(&lhs, &rhs, sizeof(Trigger)) == 0;
 }
 
 void
@@ -746,7 +746,7 @@ EGCamera::maybe_set_trigger(Trigger& target, const Trigger& last)
         grabber_.setString<ES::RemoteModule>(echo("TriggerSource"),
                                              sources[target.line]);
         grabber_.setString<ES::RemoteModule>(echo("TriggerMode"),
-                                             modes[target.line]);
+                                             modes[target.enable]);
         grabber_.setString<ES::RemoteModule>(echo("TriggerActivation"),
                                              activations[target.edge]);
     }
@@ -766,6 +766,8 @@ EGCamera::stop()
 {
     const std::scoped_lock lock(lock_);
     grabber_.stop();
+    grabber_.setString<ES::RemoteModule>(echo("TriggerMode"), "Off");
+    grabber_.cancelPop();
 }
 
 void
@@ -801,7 +803,12 @@ EGCamera::execute_trigger() const
 void
 EGCamera::get_frame(void* im, size_t* nbytes, struct ImageInfo* info)
 {
-    const std::scoped_lock lock(lock_);
+    // Locking: This function is basically read-only when it comes to EGCamera
+    // state so it doesn't need a scoped lock.
+
+    // Instancing the buffer blocks until the camera acquires the next
+    // frame. This could block for an indeterminate amount of time, e.g. when
+    // waiting on an external trigger.
     Euresys::ScopedBuffer buffer(grabber_);
 
     const auto timestamp_ns =
