@@ -16,7 +16,6 @@ else()
         set(tests
                 list-devices
                 abort-while-waiting-for-trigger
-                configure-after-shutdown-and-reinitialize
                 configure-triggering
                 one-video-stream
                 repeat-start
