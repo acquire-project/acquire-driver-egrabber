@@ -47,10 +47,10 @@ int
 main()
 {
     auto runtime = acquire_init(reporter);
-    auto dm = acquire_device_manager(runtime);
 
     try {
         CHECK(runtime);
+        auto dm = acquire_device_manager(runtime);
         CHECK(dm);
 
         AcquireProperties props = {};
