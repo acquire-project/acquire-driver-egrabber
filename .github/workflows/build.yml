@@ -23,6 +23,11 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
+      - name: Enable long paths
+        run: |
+          git config --global core.longpaths true
+        shell: pwsh
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
