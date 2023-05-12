@@ -1,14 +1,12 @@
-name: Build
+name: Create nightly release
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  schedule:
+    - cron: "0 5 * * *"  # runs at 5 AM UTC
 
 jobs:
-  windows-build:
-    name: "Build on Windows with DCAM SDK"
+  nightly-windows-build:
+    name: "Nightly build on Windows with DCAM SDK"
     strategy:
       matrix:
         build_type: [ Debug, Release ]
@@ -59,8 +57,8 @@ jobs:
           name: ${{matrix.build_type}} binaries
           path: ${{github.workspace}}/*.zip
 
-  unsupported-build:
-    name: "Build on Mac and Ubuntu"
+  nightly-unsupported-build:
+    name: "Nightly build on Mac and Ubuntu"
     strategy:
       matrix:
         build_type: [ Debug, Release ]
@@ -93,3 +91,27 @@ jobs:
         with:
           name: ${{matrix.platform}} ${{matrix.build_type}} binaries
           path: ${{github.workspace}}/*.zip
+
+  nightly-release:
+    needs: [ nightly-windows-build, nightly-unsupported-build ]
+    name: "Nightly Release"
+    runs-on: "ubuntu-latest"
+
+    permissions: write-all
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        id: download
+        with:
+          path: ${{ github.workspace }}/artifacts
+
+      - uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ github.token }}
+          automatic_release_tag: "nightly"
+          prerelease: true
+          title: "Nightly Release"
+          files: |
+            ${{steps.download.outputs.download-path}}/*/*.zip
