@@ -6,10 +6,7 @@ on:
 
 jobs:
   nightly-windows-build:
-    name: "Nightly build on Windows with DCAM SDK"
-    strategy:
-      matrix:
-        build_type: [ Debug, Release ]
+    name: "Nightly build on Windows with EGrabber SDK"
 
     runs-on: [ self-hosted, egrabber ]
 
@@ -45,23 +42,22 @@ jobs:
           arch: amd64_x86
 
       - name: Configure
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DCPACK_PACKAGE_VERSION="nightly"
 
       - name: Build
         run: |
-          cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}}
-          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C ${{matrix.build_type}} -G ZIP
+          cmake --build ${{github.workspace}}/build --config Release
+          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C Release -G ZIP
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{matrix.build_type}} binaries
+          name: Windows Release binaries
           path: ${{github.workspace}}/*.zip
 
   nightly-unsupported-build:
     name: "Nightly build on Mac and Ubuntu"
     strategy:
       matrix:
-        build_type: [ Debug, Release ]
         platform: [ "ubuntu-latest", "macos-latest" ]
 
     runs-on: ${{ matrix.platform }}
@@ -80,16 +76,16 @@ jobs:
           submodules: recursive
 
       - name: CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DNOTEST=1 -DCPACK_PACKAGE_VERSION="nightly"
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DNOTEST=1 -DCPACK_PACKAGE_VERSION="nightly"
 
       - name: Build
         run: |
-          cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}}
-          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C ${{matrix.build_type}} -G ZIP
+          cmake --build ${{github.workspace}}/build --config Release
+          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C Release -G ZIP
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{matrix.platform}} ${{matrix.build_type}} binaries
+          name: ${{matrix.platform}} Release binaries
           path: ${{github.workspace}}/*.zip
 
   nightly-release:
