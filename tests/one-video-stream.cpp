@@ -70,8 +70,7 @@ main()
                                 SIZED("out.zarr"),
                                 0,
                                 0,
-                                { 0 },
-                                1ULL << 30);
+                                { 0 });
 
         OK(acquire_configure(runtime, &props));
 
