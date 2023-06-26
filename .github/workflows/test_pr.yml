@@ -13,7 +13,7 @@ env:
 
 jobs:
   test:
-    runs-on: [ self-hosted, egrabber ]
+    runs-on: [self-hosted, egrabber]
     permissions:
       actions: write
 
@@ -53,4 +53,4 @@ jobs:
 
       - name: Test
         working-directory: ${{github.workspace}}/build
-        run: ctest -C ${{env.BUILD_TYPE}} -L egrabber --output-on-failure
+        run: ctest -C ${{env.BUILD_TYPE}} -L acquire-driver-egrabber --output-on-failure

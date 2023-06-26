@@ -37,7 +37,7 @@ else()
                 )
 
                 add_test(NAME test-${tgt} COMMAND ${tgt})
-                set_tests_properties(test-${tgt} PROPERTIES LABELS egrabber)
+                set_tests_properties(test-${tgt} PROPERTIES LABELS acquire-driver-egrabber)
         endforeach()
 
         #
