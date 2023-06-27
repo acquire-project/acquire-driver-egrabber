@@ -16,5 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changes
 
 - Updates call to `storage_properties_init` for the new function signature.
+- Reflect a change in core-libs: `StorageProperties::chunking::max_bytes_per_chunk` is now a `uint64_t` (was
+  a `uint32_t`).
 
 ## 0.1.1 - 2023-05-11
