@@ -6,7 +6,7 @@ on:
 
 jobs:
   nightly-windows-build:
-    name: "Nightly build on Windows with EGrabber SDK"
+    name: "Nightly build on Windows with eGrabber SDK"
 
     runs-on: [ self-hosted, egrabber ]
 

@@ -8,7 +8,7 @@ on:
 
 jobs:
   windows-build:
-    name: "Build on Windows with DCAM SDK"
+    name: "Build on Windows with eGrabber SDK"
     runs-on: [ self-hosted, egrabber ]
 
     permissions:
