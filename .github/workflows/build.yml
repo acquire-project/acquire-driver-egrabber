@@ -3,11 +3,13 @@ name: Build
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ] # FIXME (aliddell): this is temporary for testing
 
 jobs:
   windows-build:
     name: "Build on Windows with eGrabber SDK"
-    runs-on: [ self-hosted, egrabber ]
+    runs-on: [ self-hosted, windows, egrabber ]
 
     permissions:
       actions: write
@@ -50,16 +52,43 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: Release binaries
+          name: windows-latest Release binaries
           path: ${{github.workspace}}/*.zip
 
-  unsupported-build:
-    name: "Build on Mac and Ubuntu"
-    strategy:
-      matrix:
-        platform: [ "ubuntu-latest", "macos-latest" ]
+  linux-build:
+    name: "Build on Ubuntu"
+    runs-on: [ self-hosted, linux, egrabber ]
 
-    runs-on: ${{ matrix.platform }}
+    permissions:
+      actions: write
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build ${{github.workspace}}/build --config Release
+          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C Release -G ZIP
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ubuntu-latest Release binaries
+          path: ${{github.workspace}}/*.zip
+
+  mac-build:
+    name: "Build on Mac"
+    runs-on: macos-latest
 
     permissions:
       actions: write
@@ -84,5 +113,5 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{matrix.platform}} Release binaries
+          name: macos-latest Release binaries
           path: ${{github.workspace}}/*.zip
