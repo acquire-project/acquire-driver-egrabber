@@ -3,8 +3,6 @@ name: Build
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ] # FIXME (aliddell): this is temporary for testing
 
 jobs:
   windows-build:
@@ -56,7 +54,7 @@ jobs:
           path: ${{github.workspace}}/*.zip
 
   linux-build:
-    name: "Build on Ubuntu"
+    name: "Build on Ubuntu with eGrabber SDK"
     runs-on: [ self-hosted, linux, egrabber ]
 
     permissions:
