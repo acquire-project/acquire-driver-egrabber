@@ -13,7 +13,11 @@ env:
 
 jobs:
   test:
-    runs-on: [ self-hosted, egrabber ]
+    runs-on:
+      group: Camera  # Vieworks hardware only present on runners in this group
+      labels:
+        - self-hosted
+        - egrabber
     permissions:
       actions: write
 
