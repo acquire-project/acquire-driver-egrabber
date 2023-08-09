@@ -7,7 +7,10 @@ on:
 jobs:
   windows-build:
     name: "Build on Windows with eGrabber SDK"
-    runs-on: [ self-hosted, windows, egrabber ]
+    runs-on:
+      - self-hosted
+      - egrabber
+      - windows
 
     permissions:
       actions: write
@@ -58,7 +61,10 @@ jobs:
 
   linux-build:
     name: "Build on Ubuntu with eGrabber SDK"
-    runs-on: [ self-hosted, linux, egrabber ]
+    runs-on:
+      - self-hosted
+      - egrabber
+      - linux
 
     permissions:
       actions: write
