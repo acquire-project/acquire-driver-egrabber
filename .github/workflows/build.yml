@@ -29,7 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: recursive
+          submodules: true
 
       - name: Get CMake 3.24
         uses: lukka/get-cmake@latest
@@ -42,11 +42,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: amd64_x86
-
-      - name: Build
-        run: |
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
-          cmake --build ${{github.workspace}}/build --config Release
 
       - name: Package
         run: |
@@ -78,12 +73,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: recursive
-
-      - name: Build
-        run: |
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
-          cmake --build ${{github.workspace}}/build --config Release
+          submodules: true
 
       - name: Package
         run: |
@@ -111,7 +101,7 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          submodules: recursive
+          submodules: true
 
       - name: CMake
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DNOTEST=1
