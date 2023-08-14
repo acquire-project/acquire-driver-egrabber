@@ -140,7 +140,10 @@ jobs:
           path: ${{github.workspace}}/*.zip
 
   release:
-    needs: [ windows-build, unsupported-build ]
+    needs:
+      - windows-build
+      - linux-build
+      - mac-build
     name: "Release"
     runs-on: "ubuntu-latest"
 
