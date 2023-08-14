@@ -49,19 +49,22 @@ jobs:
         with:
           arch: amd64_x86
 
-      - name: Configure
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
-
       - name: Build
         run: |
-          cmake --build ${{github.workspace}}/build --config Release
-          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C Release -G ZIP
+          cmake -B ${{github.workspace}}/test -DCMAKE_BUILD_TYPE=Release
+          cmake --build ${{github.workspace}}/test --config Release
 
       - name: Test  # don't release unless tests pass
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}/test
         run: |
           ctest -C Release -L anyplatform --output-on-failure
           ctest -C Release -L acquire-driver-egrabber --output-on-failure
+
+      - name: Package
+        run: |
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DNOTEST=1
+          cmake --build ${{github.workspace}}/build --config Release
+          cpack --config ${{github.workspace}}/build/CPackConfig.cmake -C Release -G ZIP
 
       - uses: actions/upload-artifact@v3
         with:
