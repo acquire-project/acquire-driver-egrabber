@@ -126,7 +126,7 @@ jobs:
           submodules: true
 
       - name: CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DNOTEST=1
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DNOTEST=1 -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 
       - name: Build
         run: |
