@@ -1,6 +1,6 @@
 [submodule "acquire-common"]
 	path = acquire-common
-	url = git@github.com:aliddell/acquire-common.git
+	url = ../acquire-common.git
 [submodule "tests/acquire-driver-zarr"]
 	path = tests/acquire-driver-zarr
 	url = ../acquire-driver-zarr.git
