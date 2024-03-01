@@ -797,7 +797,10 @@ void
 EGCamera::execute_trigger() const
 {
     const std::scoped_lock lock(lock_);
+    auto source = grabber_.getString<ES::RemoteModule>("TriggerSource");
+    grabber_.setString<ES::RemoteModule>("TriggerSource", "Software");
     grabber_.execute<ES::RemoteModule>("TriggerSoftware");
+    grabber_.setString<ES::RemoteModule>("TriggerSource", source);
 }
 
 void
