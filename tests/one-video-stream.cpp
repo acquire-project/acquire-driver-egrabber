@@ -70,7 +70,8 @@ main()
                                 SIZED("out.tiff"),
                                 0,
                                 0,
-                                { 0 });
+                                { 0 },
+                                0);
 
         // avoid initing w zero shape
         props.video[0].camera.settings.shape = {
@@ -120,7 +121,10 @@ main()
                        clock_toc_ms(&clock) + time_limit_ms);
                 OK(acquire_map_read(runtime, 0, &beg, &end));
                 for (cur = beg; cur < end; cur = next(cur)) {
-                    LOG("stream %d counting frame w id %d (nframes = %d)", 0, cur->frame_id, nframes);
+                    LOG("stream %d counting frame w id %d (nframes = %d)",
+                        0,
+                        cur->frame_id,
+                        nframes);
                     CHECK(cur->shape.dims.width ==
                           props.video[0].camera.settings.shape.x);
                     CHECK(cur->shape.dims.height ==
@@ -144,7 +148,9 @@ main()
             do {
                 OK(acquire_map_read(runtime, 0, &beg, &end));
                 for (cur = beg; cur < end; cur = next(cur)) {
-                    LOG("[Flush] stream %d counting frame w id %d", 0, cur->frame_id);
+                    LOG("[Flush] stream %d counting frame w id %d",
+                        0,
+                        cur->frame_id);
                     CHECK(cur->shape.dims.width ==
                           props.video[0].camera.settings.shape.x);
                     CHECK(cur->shape.dims.height ==
@@ -152,7 +158,7 @@ main()
                     ++nframes;
                 }
                 {
-                    uint32_t n = (uint32_t) consumed_bytes(beg, end);
+                    uint32_t n = (uint32_t)consumed_bytes(beg, end);
                     OK(acquire_unmap_read(runtime, 0, n));
                     if (n)
                         LOG("[Flush] stream %d consumed bytes %d", 0, n);
@@ -161,7 +167,6 @@ main()
 
             CHECK(nframes == props.video[0].max_frame_count);
         }
-
 
         OK(acquire_abort(runtime));
         OK(acquire_shutdown(runtime));
