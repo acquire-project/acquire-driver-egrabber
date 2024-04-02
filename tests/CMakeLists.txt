@@ -64,20 +64,4 @@ else()
                         add_dependencies(${tgt} ${project}-copy-${driver}-for-tests)
                 endforeach()
         endforeach()
-
-        #
-        # Non-standard targets
-        # These might not be added to the test suite. They might be useful
-        # utilities/examples to keep around.
-        #
-        set(tgt ${project}-playground)
-        add_executable(${tgt} playground.cpp)
-        set_target_properties(${tgt} PROPERTIES
-                MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-        )
-        target_include_directories(${tgt} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../")
-        target_link_libraries(${tgt} PRIVATE
-                egrabber
-                acquire-core-logger
-                acquire-core-platform)
 endif()
