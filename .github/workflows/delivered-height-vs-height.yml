@@ -1,6 +1,9 @@
 name: Gather delivered height vs. height dataset
 
-on: workflow_call
+on:
+  pull_request:
+    branches:
+      - main
 
 env:
   BUILD_TYPE: Release
