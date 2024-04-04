@@ -10,7 +10,7 @@ env:
 
 jobs:
   run-program:
-    name: "Build on Windows with eGrabber SDK"
+    name: "Gather some data"
     runs-on:
       - self-hosted
       - egrabber
@@ -50,7 +50,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DWITH_SANDBOX=ON
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DNOTEST="TRUE" -DWITH_SANDBOX=ON
           cmake --build ${{github.workspace}}/build --config Release
 
       - name: Run
