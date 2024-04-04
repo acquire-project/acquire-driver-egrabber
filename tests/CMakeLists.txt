@@ -22,6 +22,7 @@ else()
                 one-video-stream
                 repeat-start
                 repeat-start-no-stop
+                delivered-height-vs-height
         )
 
         foreach(name ${tests})

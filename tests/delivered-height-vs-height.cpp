@@ -13,7 +13,6 @@ static class IntrospectiveLogger
     explicit IntrospectiveLogger()
       : different_heights_(false){};
 
-    // inspect for "[stream 0] Dropped", otherwise pass the mesage through
     void report_and_inspect(int is_error,
                             const char* file,
                             int line,
