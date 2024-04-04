@@ -40,7 +40,11 @@ else()
                 )
 
                 add_test(NAME test-${tgt} COMMAND ${tgt})
-                set_tests_properties(test-${tgt} PROPERTIES LABELS acquire-driver-egrabber)
+                if (name MATCHES "delivered-height-vs-height$")
+                        set_tests_properties(test-${tgt} PROPERTIES LABELS collect-dataset)
+                else()
+                        set_tests_properties(test-${tgt} PROPERTIES LABELS acquire-driver-egrabber)
+                endif()
         endforeach()
 
         #
