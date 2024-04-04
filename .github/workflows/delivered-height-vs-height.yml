@@ -1,0 +1,61 @@
+name: Gather delivered height vs. height dataset
+
+on: workflow_call
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  run-program:
+    name: "Build on Windows with eGrabber SDK"
+    runs-on:
+      - self-hosted
+      - egrabber
+      - VC-151MX-M6H00
+      - windows
+
+    permissions:
+      actions: write
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Enable long paths
+        run: |
+          git config --global core.longpaths true
+        shell: pwsh
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Get CMake 3.24
+        uses: lukka/get-cmake@latest
+        with:
+          useCloudCache: false
+          useLocalCache: true
+          cmakeVersion: 3.24.3
+
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+
+      - name: Build
+        run: |
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DWITH_SANDBOX=ON
+          cmake --build ${{github.workspace}}/build --config Release
+
+      - name: Run
+        working-directory: ${{github.workspace}}
+        run: |
+          ${{github.workspace}}/build/sandbox/Release/acquire-driver-egrabber-delivered-height-vs-height.exe
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Dataset
+          path: ${{github.workspace}}/*.zip
