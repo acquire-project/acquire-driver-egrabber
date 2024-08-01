@@ -4,7 +4,6 @@ else()
         set(NOTEST "TRUE")
         add_subdirectory(../acquire-common/acquire-driver-common ${CMAKE_CURRENT_BINARY_DIR}/acquire-driver-common)
         add_subdirectory(../acquire-common/acquire-video-runtime ${CMAKE_CURRENT_BINARY_DIR}/acquire-video-runtime)
-        #        aq_require(acquire-driver-zarr)
         set(NOTEST "FALSE")
 
         #
