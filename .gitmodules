@@ -1,7 +1,3 @@
 [submodule "acquire-common"]
 	path = acquire-common
 	url = ../acquire-common.git
-[submodule "tests/acquire-driver-zarr"]
-	path = tests/acquire-driver-zarr
-	url = ../acquire-driver-zarr.git
-	branch = main

@@ -4,7 +4,6 @@ else()
         set(NOTEST "TRUE")
         add_subdirectory(../acquire-common/acquire-driver-common ${CMAKE_CURRENT_BINARY_DIR}/acquire-driver-common)
         add_subdirectory(../acquire-common/acquire-video-runtime ${CMAKE_CURRENT_BINARY_DIR}/acquire-video-runtime)
-        aq_require(acquire-driver-zarr)
         set(NOTEST "FALSE")
 
         #
@@ -50,7 +49,6 @@ else()
         foreach(driver
                 acquire-driver-common
                 acquire-driver-egrabber
-                acquire-driver-zarr
         )
                 add_custom_target(${project}-copy-${driver}-for-tests
                         COMMAND ${CMAKE_COMMAND} -E copy
@@ -64,4 +62,37 @@ else()
                         add_dependencies(${tgt} ${project}-copy-${driver}-for-tests)
                 endforeach()
         endforeach()
+
+        # download the acquire-driver-zarr shared library to the tests directory
+        include(FetchContent)
+
+        set(ZARR_RELEASE_URL "https://github.com/acquire-project/acquire-driver-zarr/releases/download")
+        set(ZARR_VERSION "0.1.12")
+
+        if (WIN32)
+                set(ZARR_DRIVER_SUFFIX "win64")
+        elseif (APPLE)
+                set(ZARR_DRIVER_SUFFIX "Darwin")
+        elseif (UNIX)
+                set(ZARR_DRIVER_SUFFIX "Linux")
+        endif ()
+
+        FetchContent_Declare(
+                acquire_driver_zarr
+                URL "${ZARR_RELEASE_URL}/v${ZARR_VERSION}/acquire-driver-zarr-v${ZARR_VERSION}-${ZARR_DRIVER_SUFFIX}.zip"
+                DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        )
+
+        FetchContent_MakeAvailable(acquire_driver_zarr)
+        set(ZARR_DRIVER_PATH ${acquire_driver_zarr_SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}acquire-driver-zarr${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+        add_custom_target(copy_zarr_driver
+                COMMAND ${CMAKE_COMMAND} -E copy
+                ${ZARR_DRIVER_PATH}
+                $<TARGET_FILE_DIR:${project}-${onename}>
+                DEPENDS ${ZARR_DRIVER_PATH}
+                COMMENT "Copying acquire-driver-zarr to $<TARGET_FILE_DIR:${project}-${onename}>"
+        )
+
+        add_dependencies(${tgt} copy_zarr_driver)
 endif()
