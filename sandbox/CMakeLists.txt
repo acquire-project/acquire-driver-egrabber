@@ -6,6 +6,7 @@ if (${WITH_SANDBOX})
     #
     set(project acquire-driver-egrabber) # CMAKE_PROJECT_NAME gets overridden if this is a subtree of another project
 
+    ### Playground
     set(tgt ${project}-playground)
     add_executable(${tgt} playground.cpp)
     set_target_properties(${tgt} PROPERTIES
